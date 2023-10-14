@@ -1,4 +1,4 @@
-name: Print Hello World on PR and Push to 'merge_queue'
+name: merge queue
 
 on:
   pull_request:
