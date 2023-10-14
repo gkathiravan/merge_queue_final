@@ -67,7 +67,7 @@ jobs:
     - name:  pr_name
       id: pr_branch_name
       run: |
-        pr_to_merge=$(curl -s "https://api.github.com/repos/gkathiravan/merge_queue_project/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
+        pr_to_merge=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
         echo "pr_to_be_merged:"
         echo "$pr_to_merge"
         pr_number=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
@@ -83,7 +83,7 @@ jobs:
           token="${{ secrets.GITHUB_TOKEN }}"
           pr_number=${{ steps.pr_branch_name.outputs.pr_number }}
           reviews=$(curl -s -H "Authorization: Bearer $token" \
-            "https://api.github.com/repos/gkathiravan/merge_queue_project/pulls/${{ steps.pr_branch_name.outputs.pr_number }}/reviews")
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ steps.pr_branch_name.outputs.pr_number }}/reviews")
             
           echo "Reviews for PR $pr_number:"
           echo $reviews | jq '[.[] | select(.state=="APPROVED")] | length'
