@@ -1,1 +1,21 @@
+name: Print Hello World on PR and Push to 'merge_queue'
+
+on:
+  pull_request:
+    types:
+      - opened
+  push:
+    branches:
+      - merge_queue
+
+jobs:
+  hello_world:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Print Hello World
+      run: echo "Hello, World"
 
