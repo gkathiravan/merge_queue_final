@@ -2,8 +2,7 @@ name: Print Hello World on PR and Push to 'merge_queue'
 
 on:
   pull_request:
-    types:
-      - opened
+     types: [opened, synchronize]
   push:
     branches:
       - merge_queue
