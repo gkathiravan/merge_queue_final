@@ -68,6 +68,10 @@ jobs:
       id: pr_branch_name
       run: |
         pr_to_merge=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
+        pr_number=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                       "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:$pr_to_merge" \
+                       | jq -r '.[0].number')
+        echo "$pr_number"
         echo "pr_to_be_merged:"
         echo "$pr_to_merge"
         pr_number=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
