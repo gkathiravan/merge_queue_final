@@ -155,13 +155,15 @@ jobs:
 
         - name:  Merging to Main branch
           run: |
-            git config user.email "${{ github.event.pull_request.user.login }}@triconinfotech.com"
-            git config user.name "${{ github.event.pull_request.user.login }}"
+            git config user.email "merge-queue-bot@gmail.com"
+            git config user.name "merge-queue-bot"
             git fetch origin
             git checkout develop
             git merge origin/${{ github.event.pull_request.head.ref }} --no-commit --no-ff
             git commit -m "Merge changes from ${{ github.event.pull_request.head.ref }} into develop"
             git push origin develop
+          env:
+            GIT_TOKEN: ${{ secrets.BOT_GH_TOKEN }}
             
     
       
