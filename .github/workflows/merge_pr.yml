@@ -161,7 +161,7 @@ jobs:
             git checkout develop
             git merge origin/${{ github.event.pull_request.head.ref }} --no-commit --no-ff
             git commit -m "Merge changes from ${{ github.event.pull_request.head.ref }} into develop"
-            git push origin develop
+            git push origin develop --force
           env:
             GIT_TOKEN: ${{ secrets.BOT_GH_TOKEN }}
             
