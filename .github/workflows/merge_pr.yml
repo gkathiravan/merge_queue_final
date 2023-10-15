@@ -3,9 +3,9 @@ name: merge queue
 on:
   pull_request:
      types: [opened, synchronize]
-  push:
-    branches:
-      - merge_queue
+  # push:
+  #   branches:
+  #     - merge_queue
 
 jobs:
   hello_world:
@@ -140,7 +140,8 @@ jobs:
             pr_to_merge=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
             git config user.email "${{ github.event.pull_request.user.login }}@triconinfotech.com"
             git config user.name "${{ github.event.pull_request.user.login }}"
-            git fetch origin ${{ github.event.pull_request.head.ref }}
+            git fetch origin
+            git checkout ${{ github.event.pull_request.head.ref }}
             git merge origin/$pr_to_merge --no-commit --no-ff
             git commit -m "Merge changes from $pr_to_merge into ${{ github.event.pull_request.head.ref }}"
             git push origin ${{ github.event.pull_request.head.ref }}
