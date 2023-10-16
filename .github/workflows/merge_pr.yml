@@ -1,169 +1,169 @@
-name: merge queue
+# name: merge queue
 
-on:
-  pull_request:
-     types: [opened, synchronize]
-  # push:
-  #   branches:
-  #     - merge_queue
+# on:
+#   pull_request:
+#      types: [opened, synchronize]
+#   # push:
+#   #   branches:
+#   #     - merge_queue
 
-jobs:
-  hello_world:
-    runs-on: ubuntu-latest
+# jobs:
+#   hello_world:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Check out code
-      uses: actions/checkout@v3
+#     steps:
+#     - name: Check out code
+#       uses: actions/checkout@v3
 
-    - name: Print Hello World
-      run: echo "Hello, World"
+#     - name: Print Hello World
+#       run: echo "Hello, World"
   
-  print_details:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print PR Details
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Pull Request Details:"
-          echo "---------------------"
-          echo "Number: ${{ github.event.pull_request.number }}"
-          echo "Title: ${{ github.event.pull_request.title }}"
-          echo "Description: ${{ github.event.pull_request.body }}"
-          echo "Author: ${{ github.event.pull_request.user.login }}"
-          echo "URL: ${{ github.event.pull_request.html_url }}"
-          echo "Branch Name : ${{ github.event.pull_request.head.ref }}"
-          echo "---------------------"
+#   print_details:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Print PR Details
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         run: |
+#           echo "Pull Request Details:"
+#           echo "---------------------"
+#           echo "Number: ${{ github.event.pull_request.number }}"
+#           echo "Title: ${{ github.event.pull_request.title }}"
+#           echo "Description: ${{ github.event.pull_request.body }}"
+#           echo "Author: ${{ github.event.pull_request.user.login }}"
+#           echo "URL: ${{ github.event.pull_request.html_url }}"
+#           echo "Branch Name : ${{ github.event.pull_request.head.ref }}"
+#           echo "---------------------"
           
-  no_of_prs:
-    runs-on: ubuntu-latest
-    needs: print_details
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: Count PRs
-      run: |
-        pr_count=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq length)
-        echo "Number of PRs: $pr_count"
+#   no_of_prs:
+#     runs-on: ubuntu-latest
+#     needs: print_details
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+#     - name: Count PRs
+#       run: |
+#         pr_count=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq length)
+#         echo "Number of PRs: $pr_count"
         
-  name_of_the_prs:
-    runs-on: ubuntu-latest
-    needs: no_of_prs
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: List PRs
-      run: |
-        PRS=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '.[] | {number: .number, branch: .head.ref}' | jq -s 'sort_by(.number)[] | .branch')
-        echo "PR Names:"
-        echo "$PRS"
+#   name_of_the_prs:
+#     runs-on: ubuntu-latest
+#     needs: no_of_prs
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+#     - name: List PRs
+#       run: |
+#         PRS=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '.[] | {number: .number, branch: .head.ref}' | jq -s 'sort_by(.number)[] | .branch')
+#         echo "PR Names:"
+#         echo "$PRS"
         
-  approvals_check:
-    runs-on: ubuntu-latest
-    needs: name_of_the_prs
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name:  pr_name
-      id: pr_branch_name
-      run: |
-        pr_to_merge=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
-        echo "pr_to_be_merged:"
-        echo "$pr_to_merge"
-        pr_number=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                       "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:$pr_to_merge" \
-                       | jq -r '.[0].number')
-        echo "pr_number=$pr_number"
-        echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
+#   approvals_check:
+#     runs-on: ubuntu-latest
+#     needs: name_of_the_prs
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v3
+#     - name:  pr_name
+#       id: pr_branch_name
+#       run: |
+#         pr_to_merge=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
+#         echo "pr_to_be_merged:"
+#         echo "$pr_to_merge"
+#         pr_number=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+#                        "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:$pr_to_merge" \
+#                        | jq -r '.[0].number')
+#         echo "pr_number=$pr_number"
+#         echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
         
-    - name: Display PR approvals
-      id: pr_approvals
-      run: |
-          owner="${{ github.repository_owner }}"
-          repo="${{ github.repository }}"
-          token="${{ secrets.GITHUB_TOKEN }}"
-          pr_number=${{ steps.pr_branch_name.outputs.pr_number }}
-          reviews=$(curl -s -H "Authorization: Bearer $token" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ steps.pr_branch_name.outputs.pr_number }}/reviews")
+#     - name: Display PR approvals
+#       id: pr_approvals
+#       run: |
+#           owner="${{ github.repository_owner }}"
+#           repo="${{ github.repository }}"
+#           token="${{ secrets.GITHUB_TOKEN }}"
+#           pr_number=${{ steps.pr_branch_name.outputs.pr_number }}
+#           reviews=$(curl -s -H "Authorization: Bearer $token" \
+#             "https://api.github.com/repos/${{ github.repository }}/pulls/${{ steps.pr_branch_name.outputs.pr_number }}/reviews")
             
-          echo "Reviews for PR $pr_number:"
-          echo $reviews | jq '[.[] | select(.state=="APPROVED")] | length'
-          approvals = $reviews | jq '[.[] | select(.state=="APPROVED")] | length'
-          echo "approvals=$approvals" >> "$GITHUB_OUTPUT"
+#           echo "Reviews for PR $pr_number:"
+#           echo $reviews | jq '[.[] | select(.state=="APPROVED")] | length'
+#           approvals = $reviews | jq '[.[] | select(.state=="APPROVED")] | length'
+#           echo "approvals=$approvals" >> "$GITHUB_OUTPUT"
 
-    - name: Send Email if Approvals < 2
-      if: steps.pr_approvals.outputs.approvals < 2
-      run: |
-          # TODO: Replace this with email-sending logic 
-          echo "Sending email to PR owner because approvals are less than 2."
+#     - name: Send Email if Approvals < 2
+#       if: steps.pr_approvals.outputs.approvals < 2
+#       run: |
+#           # TODO: Replace this with email-sending logic 
+#           echo "Sending email to PR owner because approvals are less than 2."
           
-    - name : Getting the details of the PR
-      run: |
-          pr_data=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ steps.pr_branch_name.outputs.pr_number }}")
+#     - name : Getting the details of the PR
+#       run: |
+#           pr_data=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+#             "https://api.github.com/repos/${{ github.repository }}/pulls/${{ steps.pr_branch_name.outputs.pr_number }}")
             
-          # Extract the PR owner's username
-          echo "$pr_data" | jq -r '.head.repo.owner.login'
+#           # Extract the PR owner's username
+#           echo "$pr_data" | jq -r '.head.repo.owner.login'
           
-  conflict_check:
-      runs-on: ubuntu-latest
-      needs: approvals_check
-      steps:
-       - name : checking the state of the PR whether can me merged or not
-         run: |
-          pr_to_merge=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
-          pr_number=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                       "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:$pr_to_merge" \
-                       | jq -r '.[0].number')
-          pr_data=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number")
+#   conflict_check:
+#       runs-on: ubuntu-latest
+#       needs: approvals_check
+#       steps:
+#        - name : checking the state of the PR whether can me merged or not
+#          run: |
+#           pr_to_merge=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
+#           pr_number=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+#                        "https://api.github.com/repos/${{ github.repository }}/pulls?head=${{ github.repository_owner }}:$pr_to_merge" \
+#                        | jq -r '.[0].number')
+#           pr_data=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+#             "https://api.github.com/repos/${{ github.repository }}/pulls/$pr_number")
             
-          # Extract the PR's mergeable state
+#           # Extract the PR's mergeable state
           
-          echo "$pr_data" | jq -r '.mergeable'
+#           echo "$pr_data" | jq -r '.mergeable'
 
-          # if [[ "$pr_data" | jq -r '.mergeable' == "true" ]]; then
-          # echo "PR $${{ steps.pr_branch_name.outputs.pr_number }} can be merged."
-          # else
-          # echo "PR #$PR_NUMBER has conflicts and cannot be merged."
-          # fi
+#           # if [[ "$pr_data" | jq -r '.mergeable' == "true" ]]; then
+#           # echo "PR $${{ steps.pr_branch_name.outputs.pr_number }} can be merged."
+#           # else
+#           # echo "PR #$PR_NUMBER has conflicts and cannot be merged."
+#           # fi
           
-  # update_branch:
-  #     runs-on: ubuntu-latest
-  #     needs: conflict_check
-  #     steps:
-  #       - name: Check out repository
-  #         uses: actions/checkout@v3
+#   update_branch:
+#       runs-on: ubuntu-latest
+#       needs: conflict_check
+#       steps:
+#         - name: Check out repository
+#           uses: actions/checkout@v3
 
-  #       - name: updating the branch
-  #         run: |
-  #           pr_to_merge=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
-  #           git config user.email "${{ github.event.pull_request.user.login }}@triconinfotech.com"
-  #           git config user.name "${{ github.event.pull_request.user.login }}"
-  #           git fetch origin
-  #           git checkout ${{ github.event.pull_request.head.ref }}
-  #           git merge origin/$pr_to_merge --no-commit --no-ff
-  #           git commit -m "Merge changes from $pr_to_merge into ${{ github.event.pull_request.head.ref }}"
-  #           git push origin ${{ github.event.pull_request.head.ref }}
+#         - name: updating the branch
+#           run: |
+#             pr_to_merge=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
+#             git config user.email "${{ github.event.pull_request.user.login }}@triconinfotech.com"
+#             git config user.name "${{ github.event.pull_request.user.login }}"
+#             git fetch origin
+#             git checkout ${{ github.event.pull_request.head.ref }}
+#             git merge origin/$pr_to_merge --no-commit --no-ff
+#             git commit -m "Merge changes from $pr_to_merge into ${{ github.event.pull_request.head.ref }}"
+#             git push origin ${{ github.event.pull_request.head.ref }}
             
-  merge_to_main:
-      runs-on: ubuntu-latest
-      # needs: 
-      steps:
-        - name: Check out repository
-          uses: actions/checkout@v3
+#   merge_to_main:
+#       runs-on: ubuntu-latest
+#       # needs: 
+#       steps:
+#         - name: Check out repository
+#           uses: actions/checkout@v3
 
-        - name:  Merging to Main branch
-          run: |
-            git config user.email "merge-queue-bot@gmail.com"
-            git config user.name "merge-queue-bot"
-            git fetch origin
-            git checkout develop
-            git merge origin/${{ github.event.pull_request.head.ref }} --no-commit --no-ff
-            git commit -m "Merge changes from ${{ github.event.pull_request.head.ref }} into develop"
-            git push origin develop
-          env:
-            GIT_TOKEN: ${{ secrets.BOT_GH_TOKEN }}
+#         - name:  Merging to Main branch
+#           run: |
+#             git config user.email "merge-queue-bot@gmail.com"
+#             git config user.name "merge-queue-bot"
+#             git fetch origin
+#             git checkout develop
+#             git merge origin/${{ github.event.pull_request.head.ref }} --no-commit --no-ff
+#             git commit -m "Merge changes from ${{ github.event.pull_request.head.ref }} into develop"
+#             git push origin develop
+#           env:
+#             GIT_TOKEN: ${{ secrets.BOT_GH_TOKEN }}
             
     
       
