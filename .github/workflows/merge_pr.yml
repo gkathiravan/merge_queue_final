@@ -128,27 +128,27 @@ jobs:
           # echo "PR #$PR_NUMBER has conflicts and cannot be merged."
           # fi
           
-  update_branch:
-      runs-on: ubuntu-latest
-      needs: conflict_check
-      steps:
-        - name: Check out repository
-          uses: actions/checkout@v3
+  # update_branch:
+  #     runs-on: ubuntu-latest
+  #     needs: conflict_check
+  #     steps:
+  #       - name: Check out repository
+  #         uses: actions/checkout@v3
 
-        - name: updating the branch
-          run: |
-            pr_to_merge=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
-            git config user.email "${{ github.event.pull_request.user.login }}@triconinfotech.com"
-            git config user.name "${{ github.event.pull_request.user.login }}"
-            git fetch origin
-            git checkout ${{ github.event.pull_request.head.ref }}
-            git merge origin/$pr_to_merge --no-commit --no-ff
-            git commit -m "Merge changes from $pr_to_merge into ${{ github.event.pull_request.head.ref }}"
-            git push origin ${{ github.event.pull_request.head.ref }}
+  #       - name: updating the branch
+  #         run: |
+  #           pr_to_merge=$(curl -s "https://api.github.com/repos/${{ github.repository }}/pulls" | jq -r '[.[] | {number: .number, branch: .head.ref}] | sort_by(.number) | .[1] | .branch')
+  #           git config user.email "${{ github.event.pull_request.user.login }}@triconinfotech.com"
+  #           git config user.name "${{ github.event.pull_request.user.login }}"
+  #           git fetch origin
+  #           git checkout ${{ github.event.pull_request.head.ref }}
+  #           git merge origin/$pr_to_merge --no-commit --no-ff
+  #           git commit -m "Merge changes from $pr_to_merge into ${{ github.event.pull_request.head.ref }}"
+  #           git push origin ${{ github.event.pull_request.head.ref }}
             
   merge_to_main:
       runs-on: ubuntu-latest
-      needs: update_branch
+      needs: conflict_check
       steps:
         - name: Check out repository
           uses: actions/checkout@v3
