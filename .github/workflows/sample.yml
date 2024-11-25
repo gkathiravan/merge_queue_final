@@ -20,10 +20,10 @@ jobs:
     - name: Get previous commit ID
       id: get-commit
       run: |
-        if git rev-parse HEAD^ > /dev/null 2>&1; then
-          echo "previous=$(git rev-parse HEAD^)" >> $GITHUB_ENV
+        if git show HEAD > /dev/null 2>&1; then
+          echo "previous=$(git show HEAD~1)" >> $GITHUB_ENV
         else
-          echo "previous=null" >> $GITHUB_ENV
+          echo "previous=$(git show HEAD~1)" >> $GITHUB_ENV
         fi
 
     - name: Echo previous commit
