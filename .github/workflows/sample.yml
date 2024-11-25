@@ -1,0 +1,27 @@
+name: merge queue
+
+on:
+  pull_request:
+     types: [opened, synchronize]
+  push:
+    branches:
+      - develop
+jobs:
+  hello_world:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Print Hello World
+      run: echo "Hello, World"
+
+    - name: Get Previous Commit
+      id: get_prev_commit
+      run: |
+        echo "PREV COMMIT: $(git rev-parse HEAD^)"
+        echo "ref=$(git rev-parse HEAD^)" >> $GITHUB_OUTPUT
+    - name: QASTG Rollback
+      run: echo "${{ steps.get_prev_commit.outputs.ref }}"
+
