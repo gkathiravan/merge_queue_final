@@ -18,4 +18,4 @@ jobs:
     needs: job1
     steps:
       - name: Use Output from job1
-        run: echo "Output from job1: ${{ needs.job1.outputs.my_output }}"
+        run: echo "Output from job1:${{ needs.job1.outputs.my_output }}"
