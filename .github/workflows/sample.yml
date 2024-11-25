@@ -25,3 +25,23 @@ jobs:
     - name: QASTG Rollback
       run: echo "${{ steps.get_prev_commit.outputs.ref }}"
 
+    - name: Get the previous commit
+      run: |
+        # Fetch the previous commit hash
+        PREVIOUS_COMMIT=$(git rev-parse HEAD~1)
+          
+        # Fetch the commit message
+        PREVIOUS_COMMIT_MSG=$(git log -1 --pretty=%B HEAD~1)
+
+        echo "Previous Commit Hash: $PREVIOUS_COMMIT"
+        echo "Previous Commit Message: $PREVIOUS_COMMIT_MSG"
+
+          # Export values for debugging or subsequent steps
+        echo "PREVIOUS_COMMIT=$PREVIOUS_COMMIT" >> $GITHUB_ENV
+        echo "PREVIOUS_COMMIT_MSG=$PREVIOUS_COMMIT_MSG" >> $GITHUB_ENV
+
+    - name: Display Previous Commit Info
+      run: |
+        echo "Commit Hash: $PREVIOUS_COMMIT"
+        echo "Commit Message: $PREVIOUS_COMMIT_MSG"
+
