@@ -16,33 +16,27 @@ jobs:
 
     - name: Print Hello World
       run: echo "Hello, World"
-
-    - name: Get Previous Commit
-      id: get_prev_commit
-      run: |
-        echo "PREV COMMIT: $(git rev-parse HEAD^)"
-        echo "ref=$(git rev-parse HEAD~1)" >> $GITHUB_OUTPUT
-    - name: QASTG Rollback
-      run: echo "${{ steps.get_prev_commit.outputs.ref }}"
-
-    - name: Get the previous commit
+      
+    - name: Get Previous Commit ID
       run: |
         # Fetch the previous commit hash
-        git rev-parse HEAD~1
-        PREVIOUS_COMMIT=$(git rev-parse HEAD~1)
+        PREVIOUS_COMMIT_ID=$(git rev-parse HEAD~1)
+
+        # Export it to an environment variable
+        echo "PREVIOUS_COMMIT_ID=$PREVIOUS_COMMIT_ID" >> $GITHUB_ENV
           
-        # Fetch the commit message
-        PREVIOUS_COMMIT_MSG=$(git log -1 --pretty=%B HEAD~1)
-
-        echo "Previous Commit Hash: $PREVIOUS_COMMIT"
-        echo "Previous Commit Message: $PREVIOUS_COMMIT_MSG"
-
-          # Export values for debugging or subsequent steps
-        echo "PREVIOUS_COMMIT=$PREVIOUS_COMMIT" >> $GITHUB_ENV
-        echo "PREVIOUS_COMMIT_MSG=$PREVIOUS_COMMIT_MSG" >> $GITHUB_ENV
-
-    - name: Display Previous Commit Info
+    - name: Use Previous Commit ID
       run: |
-        echo "Commit Hash: $PREVIOUS_COMMIT"
-        echo "Commit Message: $PREVIOUS_COMMIT_MSG"
-
+        # Access the stored variable
+        echo "The previous commit ID is: $PREVIOUS_COMMIT_ID"
+      env:
+        PREVIOUS_COMMIT_ID: ${{ env.PREVIOUS_COMMIT_ID }}
+        
+    - name: Get previous commit ID
+      id: get-commit
+      run: |
+        if git rev-parse HEAD^ > /dev/null 2>&1; then
+          echo "previous=$(git rev-parse HEAD^)" >> $GITHUB_ENV
+        else
+          echo "previous=null" >> $GITHUB_ENV
+        fi
