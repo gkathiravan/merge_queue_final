@@ -17,5 +17,12 @@ jobs:
     - name: Print Hello World
       run: echo "Hello, World"
       
+    - name: Get previous commit ID
+      id: get_prev_commit
+      run: echo "PREV_COMMIT=$(git log --pretty=format:'%H' -n 2 | tail -n 1)" >> $GITHUB_ENV
+
+    - name: Log previous commit ID
+      run: echo "Previous commit ID:${{ env.PREV_COMMIT }}"
+      
     - name: Echo previous commit
       run: echo "Previous commit hash:$(git log --pretty=format:'%H' -n 2 | tail -n 1)"
