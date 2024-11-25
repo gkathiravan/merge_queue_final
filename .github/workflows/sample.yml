@@ -9,7 +9,8 @@ on:
 jobs:
   hello_world:
     runs-on: ubuntu-latest
-
+    outputs:
+      previous-commit: ${{ steps.get_prev_commit.outputs.PREV_COMMIT }}
     steps:
     - name: Check out code
       uses: actions/checkout@v3
@@ -19,10 +20,17 @@ jobs:
       
     - name: Get previous commit ID
       id: get_prev_commit
-      run: echo "PREV_COMMIT=$(git log --pretty=format:'%H' -n 2 | tail -n 1)" >> $GITHUB_ENV
+      run: echo "PREV_COMMIT=$(git log --pretty=format:'%H' -n 2 | tail -n 1)" >> $GITHUB_OUTPUT
 
     - name: Log previous commit ID
       run: echo "Previous commit ID:${{ env.PREV_COMMIT }}"
       
     - name: Echo previous commit
       run: echo "Previous commit hash:$(git log --pretty=format:'%H' -n 2 | tail -n 1)"
+      
+  bye_world:
+   runs-on: ubuntu-latest
+   needs: hello_world
+   steps:
+   - name: print previous commit
+     run: echo "${{ needs.get-previous-commit.outputs.previous-commit }}"
