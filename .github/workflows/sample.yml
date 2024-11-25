@@ -25,3 +25,6 @@ jobs:
         else
           echo "previous=null" >> $GITHUB_ENV
         fi
+
+    - name: Echo previous commit
+      run: echo "This is previous ${{ env.previous }}"
