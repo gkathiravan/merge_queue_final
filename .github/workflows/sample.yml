@@ -28,6 +28,7 @@ jobs:
     - name: Get the previous commit
       run: |
         # Fetch the previous commit hash
+        git rev-parse HEAD~1
         PREVIOUS_COMMIT=$(git rev-parse HEAD~1)
           
         # Fetch the commit message
