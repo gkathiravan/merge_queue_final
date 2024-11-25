@@ -18,4 +18,4 @@ jobs:
       run: echo "Hello, World"
       
     - name: Echo previous commit
-      run: git rev-parse HEAD^
+      run: echo "Previous commit hash:$(git log --pretty=format:'%H' -n 2 | tail -n 1)"
