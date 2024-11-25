@@ -17,21 +17,6 @@ jobs:
     - name: Print Hello World
       run: echo "Hello, World"
       
-    - name: Get Previous Commit ID
-      run: |
-        # Fetch the previous commit hash
-        PREVIOUS_COMMIT_ID=$(git rev-parse HEAD~1)
-
-        # Export it to an environment variable
-        echo "PREVIOUS_COMMIT_ID=$PREVIOUS_COMMIT_ID" >> $GITHUB_ENV
-          
-    - name: Use Previous Commit ID
-      run: |
-        # Access the stored variable
-        echo "The previous commit ID is: $PREVIOUS_COMMIT_ID"
-      env:
-        PREVIOUS_COMMIT_ID: ${{ env.PREVIOUS_COMMIT_ID }}
-        
     - name: Get previous commit ID
       id: get-commit
       run: |
