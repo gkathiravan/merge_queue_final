@@ -11,7 +11,9 @@ jobs:
     steps:
       - name: Write to $GITHUB_OUTPUT
         id: write_output
-        run: echo "my_output=$(git log --pretty=format:'%H' -n 2 | tail -n 1)" >> $GITHUB_OUTPUT
+        run: |
+          commit=$(git log --pretty=format:'%H' -n 2 | tail -n 1)
+          echo "my_output=$commit" >> $GITHUB_OUTPUT
 
   job2:
     runs-on: ubuntu-latest
