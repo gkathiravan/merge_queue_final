@@ -3,7 +3,7 @@ name: Dependency Check Workflow
 on:
   pull_request: # Trigger this workflow on pull request events
     branches:
-      - main # Adjust this to the branch where you want the workflow to run
+      - develop # Adjust this to the branch where you want the workflow to run
 
 jobs:
   job-a:
