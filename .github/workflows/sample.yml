@@ -1,23 +1,47 @@
-name: Share Outputs Between Jobs
+name: Dependency Check Workflow
 
 on:
-  push:
+  pull_request: # Trigger this workflow on pull request events
+    branches:
+      - main # Adjust this to the branch where you want the workflow to run
 
 jobs:
-  job1:
+  job-a:
     runs-on: ubuntu-latest
-    outputs:
-      my_output: ${{ steps.write_output.outputs.my_output }}
     steps:
-      - name: Write to $GITHUB_OUTPUT
-        id: write_output
+      - name: Run Job A
         run: |
-          commit=$(git log --pretty=format:'%H' -n 2 | tail -n 1)
-          echo "my_output=$commit" >> $GITHUB_OUTPUT
+          echo "Running Job A"
+          exit 1 # Simulate failure for testing
 
-  job2:
+  job-c:
     runs-on: ubuntu-latest
-    needs: job1
     steps:
-      - name: Use Output from job1
-        run: echo "Output from job1:${{ git log --pretty=format:'%H' -n 2 | tail -n 1 }}"
+      - name: Run Job C
+        run: |
+          echo "Running Job C"
+          exit 0 # Simulate success for testing
+
+  job-d:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Job D
+        run: |
+          echo "Running Job D"
+          exit 0 # Simulate success for testing
+
+  job-b:
+    runs-on: ubuntu-latest
+    needs: [job-a, job-c, job-d]
+    if: always() # Run Job B regardless of dependency results
+    steps:
+      - name: Check Dependency Results
+        run: |
+          if [ "${{ needs.job-a.result }}" != "success" ] || 
+             [ "${{ needs.job-c.result }}" != "success" ] || 
+             [ "${{ needs.job-d.result }}" != "success" ]; then
+            echo "At least one dependency failed."
+            exit 1
+          fi
+
+          echo "All dependencies succeeded. Job B succeeded."
