@@ -12,7 +12,7 @@ jobs:
       - name: Run Job A
         run: |
           echo "Running Job A"
-          exit 1 # Simulate failure for testing
+          exit 0 # Simulate success for testing
 
   job-c:
     runs-on: ubuntu-latest
